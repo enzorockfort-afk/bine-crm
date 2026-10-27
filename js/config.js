@@ -14,12 +14,12 @@ export const SHOP = {
    данные хранятся только в этом браузере.
    ========================================================= */
 export const FIREBASE = {
-  apiKey: "",
-  authDomain: "",
-  projectId: "",
-  storageBucket: "",
-  messagingSenderId: "",
-  appId: "",
+  apiKey: "AIzaSyBeT-5IXv4cynmLtECavfDY0okViKD6wLM",
+  authDomain: "binecrm.firebaseapp.com",
+  projectId: "binecrm",
+  storageBucket: "binecrm.firebasestorage.app",
+  messagingSenderId: "103777865626",
+  appId: "1:103777865626:web:00a247429751b92383f423",
 };
 
 /* Вход в CRM: вводится только пароль.
@@ -27,7 +27,7 @@ export const FIREBASE = {
      (аккаунт создаётся в Firebase Console → Authentication → Add user).
    - Демо-режим: пароль сверяется с хэшем ниже (сам пароль в коде не хранится).
    Сменить пароль для демо: node -e "console.log(require('crypto').createHash('sha256').update('bine-crm:НОВЫЙ').digest('hex'))" */
-export const CRM_EMAIL = "admin@binestore.md";
+export const CRM_EMAIL = "babaevdavid88@gmail.com";
 export const CRM_PASS_HASH = "7283574ebbbe30f3e0dfa35ca40a4d24fef97282de8a349aa450442b6514ab52";
 
 /* Демо-бэкенд создаёт локального администратора (в режиме Firebase не используется) */
