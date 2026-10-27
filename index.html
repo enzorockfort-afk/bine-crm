@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Bine CRM</title>
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="theme-color" content="#000000">
+  <link rel="icon" type="image/jpeg" href="assets/logo.jpg">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="assets/logo.jpg">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Onest:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/main.css?v=1">
+  <link rel="stylesheet" href="css/crm.css?v=1">
+</head>
+<body class="crm-body">
+<div class="crm" id="app">
+  <aside class="crm-side" aria-label="Разделы CRM">
+    <a class="crm-logo" href="./"><img src="assets/logo.jpg" alt="" width="34" height="34"><span>Bine <b>CRM</b></span></a>
+    <nav class="crm-nav" id="nav">
+      <a href="#today" data-v="today"><svg viewBox="0 0 24 24"><path d="M4 11.5 12 4l8 7.5V20h-5.5v-5h-5v5H4z"/></svg><span>Сегодня</span></a>
+      <a href="#deals" data-v="deals"><svg viewBox="0 0 24 24"><rect x="3.5" y="4" width="4.5" height="16" rx="1.5"/><rect x="9.75" y="4" width="4.5" height="11" rx="1.5"/><rect x="16" y="4" width="4.5" height="7" rx="1.5"/></svg><span>Сделки</span><b class="n" id="nNew"></b></a>
+      <a href="#clients" data-v="clients"><svg viewBox="0 0 24 24"><circle cx="9" cy="8.5" r="3.5"/><path d="M2.5 20c.9-3.4 3.3-5 6.5-5s5.6 1.6 6.5 5"/><path d="M16 5.2a3.5 3.5 0 0 1 0 6.6M18.5 15.3c1.5.7 2.5 2.2 3 4.7"/></svg><span>Клиенты</span></a>
+      <a href="#stock" data-v="stock"><svg viewBox="0 0 24 24"><path d="M3.5 7.5 12 3l8.5 4.5v9L12 21l-8.5-4.5v-9Z"/><path d="M3.5 7.5 12 12l8.5-4.5M12 12v9"/></svg><span>Склад</span></a>
+      <a href="#tasks" data-v="tasks"><svg viewBox="0 0 24 24"><rect x="4" y="4.5" width="16" height="16" rx="3"/><path d="M8 2.5v4M16 2.5v4M4 10h16M8.5 14.5l2 2 4-4"/></svg><span>Задачи</span><b class="n" id="nTasks"></b></a>
+      <a href="#data" data-v="data" class="hide-tab"><svg viewBox="0 0 24 24"><ellipse cx="12" cy="6" rx="7.5" ry="2.8"/><path d="M4.5 6v12c0 1.5 3.4 2.8 7.5 2.8s7.5-1.3 7.5-2.8V6M4.5 12c0 1.5 3.4 2.8 7.5 2.8s7.5-1.3 7.5-2.8"/></svg><span>Данные</span></a>
+    </nav>
+    <div class="crm-side-foot">
+      <a id="shopLink" href="#" target="_blank" rel="noopener">Сайт магазина</a>
+      <button class="link-plain" id="logout" style="text-align:left;text-decoration:none">Выйти</button>
+    </div>
+  </aside>
+
+  <section class="crm-main">
+    <header class="crm-top">
+      <h1 id="title">Сегодня</h1>
+      <div class="crm-top-acts">
+        <label class="crm-search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/></svg><input id="q" type="search" placeholder="Поиск: имя, телефон, вещь" aria-label="Поиск по CRM"></label>
+        <button class="btn btn-chrome btn-sm" id="newDeal"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg><span>Сделка</span></button>
+      </div>
+    </header>
+    <div class="crm-demo" id="demoNote" hidden>Демо-режим: данные хранятся только в этом браузере. Подключите Firebase (README) и перенесите данные через раздел «Данные».</div>
+    <div class="crm-view" id="view"></div>
+  </section>
+</div>
+
+<div class="crm-guard" id="guard" hidden></div>
+
+<!-- side panel for deal / client -->
+<div class="scrim" id="pScrim" hidden></div>
+<aside class="panel-side" id="panel" aria-hidden="true" aria-labelledby="pTitle">
+  <div class="ps-head"><h2 id="pTitle"></h2><button class="ic-btn" id="pClose" aria-label="Закрыть"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
+  <div class="ps-body" id="pBody"></div>
+  <div class="ps-foot" id="pFoot"></div>
+</aside>
+
+<dialog class="modal crm-modal" id="dealModal" aria-labelledby="dmTitle">
+  <form id="dealForm" novalidate style="display:contents">
+    <div class="modal-head"><h2 id="dmTitle">Новая сделка</h2><button type="button" class="ic-btn" data-close aria-label="Закрыть"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
+    <div class="modal-body one">
+      <div class="seg" role="radiogroup" aria-label="Тип сделки">
+        <label><input type="radio" name="kind" value="request" checked><span>Под заказ из Китая</span></label>
+        <label><input type="radio" name="kind" value="order"><span>Из наличия</span></label>
+      </div>
+      <div class="row2">
+        <label class="field"><span>Клиент *</span><input class="input" name="cname" list="clientList" autocomplete="off" placeholder="Имя"></label>
+        <label class="field"><span>Телефон *</span><input class="input" name="cphone" type="tel" placeholder="+373 6__ __ ___"></label>
+      </div>
+      <datalist id="clientList"></datalist>
+      <label class="field"><span>Откуда пришёл</span><select class="select" name="source" id="srcSel"></select></label>
+      <div class="stack" data-k="request">
+        <label class="field"><span>Что ищет *</span><input class="input" name="title" placeholder="Nike Dunk Low Panda"></label>
+        <div class="row2">
+          <label class="field"><span>Размер</span><input class="input" name="size"></label>
+          <label class="field"><span>Цена продажи, лей</span><input class="input" name="price" type="number" inputmode="numeric" min="0"></label>
+        </div>
+      </div>
+      <div class="stack" data-k="order" hidden>
+        <label class="field"><span>Товар *</span><select class="select" name="product" id="prodSel"></select></label>
+        <div class="row2">
+          <label class="field"><span>Размер *</span><select class="select" name="psize" id="sizeSel"></select></label>
+          <label class="field"><span>Цена, лей</span><input class="input" name="pprice" type="number" inputmode="numeric" min="0"></label>
+        </div>
+      </div>
+      <label class="field"><span>Комментарий</span><textarea class="textarea" name="comment" rows="2"></textarea></label>
+      <p class="form-err" id="dmErr" role="alert"></p>
+    </div>
+    <div class="modal-foot"><button type="button" class="btn btn-ghost" data-close>Отмена</button><button class="btn btn-chrome" id="dmSave">Создать</button></div>
+  </form>
+</dialog>
+
+<script type="module" src="js/crm.js?v=1"></script>
+</body>
+</html>

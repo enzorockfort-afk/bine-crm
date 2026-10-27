@@ -1,0 +1,63 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() { return request.auth != null; }
+    function isAdmin() {
+      return signedIn() && exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+
+    // Администраторы: документ admins/{uid} создаётся вручную в консоли
+    match /admins/{uid} {
+      allow read: if signedIn() && request.auth.uid == uid;
+      allow write: if false;
+    }
+
+    // Товары: опубликованные видят все, черновики — только админ
+    match /products/{id} {
+      allow read: if resource.data.published == true || isAdmin();
+      allow write: if isAdmin();
+
+      match /images/{n} {
+        allow read: if get(/databases/$(database)/documents/products/$(id)).data.published == true || isAdmin();
+        allow write: if isAdmin();
+      }
+    }
+
+    // CRM: клиенты и задачи — только администратор
+    match /clients/{id} { allow read, write: if isAdmin(); }
+    match /tasks/{id} { allow read, write: if isAdmin(); }
+
+    // Профили покупателей
+    match /users/{uid} {
+      allow read, write: if signedIn() && request.auth.uid == uid;
+      allow read: if isAdmin();
+    }
+
+    // Заявки «под заказ из Китая»: до 3 фото, создать может любой
+    match /requests/{id} {
+      allow create: if request.resource.data.status == 'new'
+        && request.resource.data.title is string
+        && request.resource.data.title.size() > 1
+        && request.resource.data.photos is list
+        && request.resource.data.photos.size() <= 3
+        && (request.resource.data.uid == null
+            || (signedIn() && request.resource.data.uid == request.auth.uid));
+      allow read: if isAdmin() || (signedIn() && resource.data.uid == request.auth.uid);
+      allow write: if isAdmin();
+    }
+
+    // Заказы: создать может любой (в т.ч. гость), видит — владелец и админ
+    match /orders/{id} {
+      allow create: if request.resource.data.status == 'new'
+        && request.resource.data.items is list
+        && request.resource.data.items.size() > 0
+        && request.resource.data.items.size() <= 50
+        && request.resource.data.total is number
+        && (request.resource.data.uid == null
+            || (signedIn() && request.resource.data.uid == request.auth.uid));
+      allow read: if isAdmin() || (signedIn() && resource.data.uid == request.auth.uid);
+      allow write: if isAdmin();
+    }
+  }
+}
